@@ -1,16 +1,17 @@
-import os, argparse
+import os, argparse, sys
 
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
 from functions.call_function import available_functions, call_function
+from config import MAX_ITERATION
 from prompts import system_prompt
 
 def main():
   parser = argparse.ArgumentParser(description="Weaver Code Assistant")
-  parser.add_argument("user prompt", type=str, help="Prompt to send to Gemini")
-  parser.add_argument("--verbose", action=store_true", help="Enable verbose output")
+  parser.add_argument("user_prompt", type=str, help="Prompt to send to Gemini")
+  parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
   args = parser.parse_args()
   
   load_dotenv()
@@ -69,7 +70,8 @@ def generate_content(client, messages, verbose):
       raise RuntimeError(f"Empty function response for {function_call.name}")
     if verbose:
       print(f"-> {result.parts[0].function_response.response}")
-    function_response.append(result.parts[0])
+    function_responses.append(result.parts[0])
+
   messages.append(types.Content(role="user", parts=function_responses))
 if __name__ == "__main__":
   main()
